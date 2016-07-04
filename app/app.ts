@@ -1,6 +1,7 @@
 import {bootstrap} from '@angular/platform-browser-dynamic';
 import {Component, Pipe, PipeTransform} from '@angular/core';
 import {NgFor} from '@angular/common';
+import {DomSanitizationService} from '@angular/platform-browser';
 
 @Pipe({ name: 'byteFormat'})
 class ByteFormatPipe implements PipeTransform {
@@ -32,10 +33,10 @@ class ByteFormatPipe implements PipeTransform {
       </p>
     </div>
 
-    <div class="media" *ngFor="#image of images">
+    <div class="media" *ngFor="let image of images">
       <div class="media-left">
         <a href="#">
-          <img class="media-object" src="{{image.path}}" style="max-width:200px">
+          <img class="media-object" [src]="sanitize(image.path)" style="max-width:200px">
         </a>
       </div>
       <div class="media-body">
@@ -50,7 +51,14 @@ export class App {
 
   images:Array<Object> = [];
 
-  constructor() {}
+  constructor(private sanitizer:DomSanitizationService) {
+
+  }
+
+  sanitize(url:string)
+  {
+    return this.sanitizer.bypassSecurityTrustUrl(url);
+  }
 
   handleDrop(e) {
     var files:File = e.dataTransfer.files;
